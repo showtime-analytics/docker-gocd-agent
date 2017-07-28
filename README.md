@@ -18,7 +18,7 @@ This will start the GoCD agent and connect it the GoCD server specified by `GO_S
 
 ## Usage with docker GoCD server
 
-If you have a [gocd-server container](https://hub.docker.com/r/gocd/gocd-server/) running and it's named `angry_feynman`, you can connect a gocd-agent container to it by doing:
+If you have a [gocd-server container](https://hub.docker.com/r/showtimeanalytics/gocd-server/) running and it's named `angry_feynman`, you can connect a gocd-agent container to it by doing:
 
 ```
 docker run -itd -e GO_SERVER_URL=https://$(docker inspect --format='{{(index (index .NetworkSettings.IPAddress))}}' angry_feynman):$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8154/tcp") 0).HostPort}}' angry_feynman)/go showtimeanalytics/gocd-agent:17.4.0
@@ -45,10 +45,10 @@ This image will work well with the [docker elastic agent plugin](https://github.
 
 ### Mounting volumes
 
-The GoCD agent will store all configuration, logs and perform builds in `/data`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/opt/gocd`.
+The GoCD agent will store all configuration, logs and perform builds in `/gocd-data`. If you'd like to provide secure credentials like SSH private keys among other things, you can mount `/opt/gocd`.
 
 ```
-docker run -v /path/to/godata:/data -v /path/to/home-dir:/opt/gocd showtimeanalytics/gocd-agent:17.4.0
+docker run -v /path/to/godata:/gocd-data -v /path/to/home-dir:/opt/gocd showtimeanalytics/gocd-agent:17.4.0
 ```
 
 > **Note:** Ensure that `/path/to/home-dir` and `/path/to/godata` are accessible by the `gocd` user in container (`go` user - uid 10014).
@@ -72,12 +72,12 @@ AGNET_MAX_MEM="1024m"
 
 The GoCD server runs as the `go` user, the location of the various directories is:
 
-| Directory           | Description                                                                      |
-|---------------------|----------------------------------------------------------------------------------|
-| `/data/config`      | the directory where the GoCD configuration is store                              |
-| `/data/pipelines`   | the directory where the agent will run builds                                    |
-| `/data/logs`        | the directory where GoCD logs will be written out to                             |
-| `/opt/gocd`         | the home directory for the GoCD server                                           |
+| Directory                | Description                                                                      |
+|--------------------------|----------------------------------------------------------------------------------|
+| `/gocd-data/config`      | the directory where the GoCD configuration is store                              |
+| `/gocd-data/pipelines`   | the directory where the agent will run builds                                    |
+| `/gocd-data/logs`        | the directory where GoCD logs will be written out to                             |
+| `/opt/gocd`              | the home directory for the GoCD server                                           |
 
 ## Troubleshooting
 
@@ -85,7 +85,7 @@ The GoCD server runs as the `go` user, the location of the various directories i
 
 - Check if the docker container is running `docker ps -a`
 - Check the STDOUT to see if there is any output that indicates failures `docker logs CONTAINER_ID`
-- Check the agent logs `docker exec -it CONTAINER_ID /bin/bash`, then run `less /data/logs/*.log` inside the container.
+- Check the agent logs `docker exec -it CONTAINER_ID /bin/bash`, then run `less /gocd-data/logs/*.log` inside the container.
 
 ## Acknowledgments
 
